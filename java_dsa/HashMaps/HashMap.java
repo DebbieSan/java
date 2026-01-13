@@ -1,3 +1,7 @@
+/*
+A HashMap exercise that implements a basic hash map using separate chaining with linked lists. 
+The program uses a bird census demo to store, retrieve, and delete bird-location entries.
+ */
 
 public class HashMap {
 
