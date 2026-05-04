@@ -391,6 +391,137 @@ public class AVLTree {
         System.out.println("It does not change the BST ordering or the stored items.");
     }
 
+    // Store all values from T1 using inorder traversal.
+    // This gives the values in sorted order because T1 is a BST.
+    void storeInOrder(TreeNode current, java.util.ArrayList<Integer> values) {
+        if (current != null) {
+            storeInOrder(current.left, values);
+            values.add(current.value);
+            storeInOrder(current.right, values);
+        }
+    }
+
+    // Transform BST T1 into another BST T2 with the same items.
+    // T2 is created using AVL insertion, which uses rotations.
+    TreeNode transformT1ToT2UsingAVLRotations(TreeNode t1) {
+        java.util.ArrayList<Integer> values = new java.util.ArrayList<>();
+
+        // Step 1: Get all items from T1
+        storeInOrder(t1, values);
+
+        // Step 2: Build T2 using AVL insertions
+        TreeNode t2 = null;
+
+        for (int value : values) {
+            t2 = add(t2, value);
+        }
+
+        return t2;
+    }
+
+    // Demonstrates the algorithm
+    void demonstrateT1ToT2Algorithm() {
+        System.out.println();
+        System.out.println("Transforming BST T1 into BST T2 using AVL rotations");
+
+        /*
+         * BST T1:
+         * 
+         * 15
+         * \
+         * 35
+         * \
+         * 45
+         * \
+         * 60
+         * \
+         * 75
+         * /
+         * 40
+         * 
+         * T1 is a BST, but it is not balanced.
+         */
+
+        TreeNode t1 = null;
+
+        t1 = addBST(t1, 15);
+        t1 = addBST(t1, 35);
+        t1 = addBST(t1, 45);
+        t1 = addBST(t1, 60);
+        t1 = addBST(t1, 75);
+        t1 = addBST(t1, 40);
+
+        System.out.println();
+        System.out.println("BST T1 before transformation:");
+        printTreeShape(t1, 0);
+
+        System.out.print("Items in T1: ");
+        printInOrder(t1);
+        System.out.println();
+
+        TreeNode t2 = transformT1ToT2UsingAVLRotations(t1);
+
+        System.out.println();
+        System.out.println("BST T2 after transformation using AVL rotations:");
+        printTreeShape(t2, 0);
+
+        System.out.print("Items in T2: ");
+        printInOrder(t2);
+        System.out.println();
+
+        System.out.println();
+        System.out.println("Summary:");
+        System.out.println("T1 and T2 are both BSTs.");
+        System.out.println("T1 and T2 contain the same items.");
+        System.out.println("T2 was built using AVL insertion, which performs rotations when needed.");
+    }
+
+    void printT1ToT2AlgorithmExplanation() {
+        System.out.println();
+        System.out.println("-------T1 to T2 Algorithm Explanation:-------");
+        System.out.println("We start with a regular Binary Search Tree called T1.");
+        System.out.println("The goal is to transform T1 into another Binary Search Tree called T2.");
+        System.out.println("T2 must contain the exact same items as T1.");
+        System.out.println();
+
+        System.out.println("Step 1:");
+        System.out.println("Perform an inorder traversal of T1.");
+        System.out.println("Because T1 is a BST, inorder traversal visits the values in sorted order.");
+        System.out.println();
+
+        System.out.println("Step 2:");
+        System.out.println("Store all values from T1 in an ArrayList.");
+        System.out.println("This takes O(N) time because every node is visited once.");
+        System.out.println();
+
+        System.out.println("Step 3:");
+        System.out.println("Create a new empty tree called T2.");
+        System.out.println("Insert every value from the ArrayList into T2 using the AVL add() method.");
+        System.out.println();
+
+        System.out.println("Step 4:");
+        System.out.println("The AVL add() method keeps T2 balanced.");
+        System.out.println("If T2 becomes unbalanced, the code uses AVL rotations.");
+        System.out.println("These rotations include single rotations such as rotateLeft() and rotateRight().");
+        System.out.println();
+
+        System.out.println("Why this is O(N log N) average time:");
+        System.out.println("The inorder traversal of T1 takes O(N) time.");
+        System.out.println("Then we insert N items into T2.");
+        System.out.println("Each AVL insertion takes O(log N) average time because the AVL tree height is O(log N).");
+        System.out.println("So N insertions take O(N log N) time.");
+        System.out.println();
+
+        System.out.println("Total time:");
+        System.out.println("O(N) + O(N log N) = O(N log N).");
+        System.out.println();
+
+        System.out.println("Summary:");
+        System.out.println("T1 and T2 are both BSTs.");
+        System.out.println("T1 and T2 contain the same items.");
+        System.out.println("The AVL rotations change the shape of the tree, but not the stored values.");
+    }
+
     public static void main(String[] args) {
         AVLTree tree = new AVLTree();
 
@@ -439,6 +570,10 @@ public class AVLTree {
         System.out.println(tree.searchBST(tree.bstRoot, 100));
 
         tree.demonstrateBSTTransformationUsingSingleRotation();
+
+        tree.demonstrateT1ToT2Algorithm();
+
+        tree.printT1ToT2AlgorithmExplanation();
 
     }
 }
