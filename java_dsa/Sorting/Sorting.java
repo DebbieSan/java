@@ -7,14 +7,26 @@ public class Sorting {
         // This is the original unsorted sequence.
         int[] numbers = { 3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5 };
 
-        // Print the array before sorting.
-        System.out.println("Sequence before: " + Arrays.toString(numbers));
+        // We make two copies of the same sequence.
+        // This lets us test merge sort and quick sort separately.
+        int[] mergeNumbers = Arrays.copyOf(numbers, numbers.length);
+        int[] quickNumbers = Arrays.copyOf(numbers, numbers.length);
+
+        // Print the original array.
+        System.out.println("Original sequence: " + Arrays.toString(numbers));
 
         // Start the merge sort algorithm.
-        mergeSort(numbers);
+        mergeSort(mergeNumbers);
 
-        // Print the array after sorting.
-        System.out.println("Sequence after: " + Arrays.toString(numbers));
+        // Print the array after merge sort.
+        System.out.println("After merge sort: " + Arrays.toString(mergeNumbers));
+
+        // Start the quick sort algorithm.
+        // quickSort needs the array, the first index, and the last index.
+        quickSort(quickNumbers, 0, quickNumbers.length - 1);
+
+        // Print the array after quick sort.
+        System.out.println("After quick sort: " + Arrays.toString(quickNumbers));
     }
 
     public static void mergeSort(int[] arr) {
@@ -110,5 +122,60 @@ public class Sorting {
             j++;
             k++;
         }
+    }
+
+    public static void quickSort(int[] arr, int low, int high) {
+
+        // If low is less than high, that means there are
+        // at least two numbers in this section to sort.
+        if (low < high) {
+
+            // Partition the array and get the pivot's final position.
+            int pivotIndex = partition(arr, low, high);
+
+            // Recursion:
+            // Sort the left side of the pivot.
+            quickSort(arr, low, pivotIndex - 1);
+
+            // Recursion:
+            // Sort the right side of the pivot.
+            quickSort(arr, pivotIndex + 1, high);
+        }
+    }
+
+    public static int partition(int[] arr, int low, int high) {
+
+        // Pivot strategy:
+        // We choose the last element in this section as the pivot.
+        int pivot = arr[high];
+
+        // i keeps track of where the next smaller number should go.
+        int i = low - 1;
+
+        // Look at each number from low to high - 1.
+        // We do not include high because high is the pivot.
+        for (int j = low; j < high; j++) {
+
+            // If the current number is less than or equal to the pivot,
+            // move it to the left side.
+            if (arr[j] <= pivot) {
+                i++;
+
+                // Swap arr[i] and arr[j].
+                int temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+        }
+
+        // Put the pivot in its correct final position.
+        // Everything smaller is now on the left.
+        // Everything bigger is now on the right.
+        int temp = arr[i + 1];
+        arr[i + 1] = arr[high];
+        arr[high] = temp;
+
+        // Return the pivot's final position.
+        return i + 1;
     }
 }
