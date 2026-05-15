@@ -1,4 +1,7 @@
-//Source: https://www.geeksforgeeks.org/java/avl-tree-program-in-java/
+// Source idea adapted from:
+// https://www.geeksforgeeks.org/java/avl-tree-program-in-java/
+
+import java.util.ArrayList;
 
 class TreeNode {
     int value;
@@ -11,7 +14,7 @@ class TreeNode {
     TreeNode(int value) {
         this.value = value;
         this.height = 1;
-        this.color = "BLACK"; // default color
+        this.color = "BLACK";
     }
 }
 
@@ -19,11 +22,8 @@ public class AVLTree {
 
     TreeNode root;
 
-    // Separate root for the normal BST
-    TreeNode bstRoot;
+    // Basic AVL methods
 
-    // Returns the height of a node.
-    // Empty nodes have height 0.
     int getHeight(TreeNode current) {
         if (current == null) {
             return 0;
@@ -31,88 +31,113 @@ public class AVLTree {
         return current.height;
     }
 
-    // Returns whichever number is larger.
-    int bigger(int first, int second) {
+    int max(int first, int second) {
         return (first > second) ? first : second;
     }
 
-    // Fixes a left-heavy subtree by rotating it to the right.
-    TreeNode rotateRight(TreeNode current) {
-        TreeNode newRoot = current.left;
-        TreeNode movedSubtree = newRoot.right;
-
-        // Move nodes into their new positions
-        newRoot.right = current;
-        current.left = movedSubtree;
-
-        // Recalculate heights after the rotation
-        current.height = bigger(getHeight(current.left), getHeight(current.right)) + 1;
-        newRoot.height = bigger(getHeight(newRoot.left), getHeight(newRoot.right)) + 1;
-
-        return newRoot;
-    }
-
-    // Fixes a right-heavy subtree by rotating it to the left.
-    TreeNode rotateLeft(TreeNode current) {
-        TreeNode newRoot = current.right;
-        TreeNode movedSubtree = newRoot.left;
-
-        // Move nodes into their new positions
-        newRoot.left = current;
-        current.right = movedSubtree;
-
-        // Recalculate heights after the rotation
-        current.height = bigger(getHeight(current.left), getHeight(current.right)) + 1;
-        newRoot.height = bigger(getHeight(newRoot.left), getHeight(newRoot.right)) + 1;
-
-        return newRoot;
-    }
-
-    // Balance factor = height of left subtree - height of right subtree.
-    int balanceFactor(TreeNode current) {
+    int getBalanceFactor(TreeNode current) {
         if (current == null) {
             return 0;
         }
         return getHeight(current.left) - getHeight(current.right);
     }
 
-    // Adds a value to the AVL tree and keeps the tree balanced.
-    TreeNode add(TreeNode current, int value) {
+    TreeNode rotateRight(TreeNode current) {
+        TreeNode newRoot = current.left;
+        TreeNode movedSubtree = newRoot.right;
+
+        /*
+         * Before right rotation:
+         *
+         * current
+         * /
+         * newRoot
+         * \
+         * movedSubtree
+         *
+         * After right rotation:
+         *
+         * newRoot
+         * \
+         * current
+         * /
+         * movedSubtree
+         */
+
+        newRoot.right = current;
+        current.left = movedSubtree;
+
+        current.height = max(getHeight(current.left), getHeight(current.right)) + 1;
+        newRoot.height = max(getHeight(newRoot.left), getHeight(newRoot.right)) + 1;
+
+        return newRoot;
+    }
+
+    TreeNode rotateLeft(TreeNode current) {
+        TreeNode newRoot = current.right;
+        TreeNode movedSubtree = newRoot.left;
+
+        /*
+         * Before left rotation:
+         *
+         * current
+         * \
+         * newRoot
+         * /
+         * movedSubtree
+         *
+         * After left rotation:
+         *
+         * newRoot
+         * /
+         * current
+         * \
+         * movedSubtree
+         */
+
+        newRoot.left = current;
+        current.right = movedSubtree;
+
+        current.height = max(getHeight(current.left), getHeight(current.right)) + 1;
+        newRoot.height = max(getHeight(newRoot.left), getHeight(newRoot.right)) + 1;
+
+        return newRoot;
+    }
+
+    TreeNode addAVL(TreeNode current, int value) {
         if (current == null) {
             return new TreeNode(value);
         }
 
         if (value < current.value) {
-            current.left = add(current.left, value);
+            current.left = addAVL(current.left, value);
         } else if (value > current.value) {
-            current.right = add(current.right, value);
+            current.right = addAVL(current.right, value);
         } else {
-            return current; // Duplicate values are ignored
+            return current; // Ignore duplicate values
         }
 
-        // Update this node's height
-        current.height = bigger(getHeight(current.left), getHeight(current.right)) + 1;
+        current.height = max(getHeight(current.left), getHeight(current.right)) + 1;
 
-        // Check whether this node became unbalanced
-        int balance = balanceFactor(current);
+        int balance = getBalanceFactor(current);
 
-        // Case 1: inserted into the left side of the left child
+        // Left Left case
         if (balance > 1 && value < current.left.value) {
             return rotateRight(current);
         }
 
-        // Case 2: inserted into the right side of the right child
+        // Right Right case
         if (balance < -1 && value > current.right.value) {
             return rotateLeft(current);
         }
 
-        // Case 3: inserted into the right side of the left child
+        // Left Right case
         if (balance > 1 && value > current.left.value) {
             current.left = rotateLeft(current.left);
             return rotateRight(current);
         }
 
-        // Case 4: inserted into the left side of the right child
+        // Right Left case
         if (balance < -1 && value < current.right.value) {
             current.right = rotateRight(current.right);
             return rotateLeft(current);
@@ -121,10 +146,8 @@ public class AVLTree {
         return current;
     }
 
-    // ---------------- BST METHODS ----------------
+    // Normal BST methods
 
-    // Adds a value to a regular BST.
-    // Unlike AVL insertion, this method does not rotate or rebalance.
     TreeNode addBST(TreeNode current, int value) {
         if (current == null) {
             return new TreeNode(value);
@@ -134,14 +157,11 @@ public class AVLTree {
             current.left = addBST(current.left, value);
         } else if (value > current.value) {
             current.right = addBST(current.right, value);
-        } else {
-            return current; // Duplicate values are ignored
         }
 
         return current;
     }
 
-    // Searches for a value in a regular BST.
     boolean searchBST(TreeNode current, int value) {
         if (current == null) {
             return false;
@@ -156,27 +176,8 @@ public class AVLTree {
         }
     }
 
-    // Prints the BST in sorted order.
-    void printBSTInOrder(TreeNode current) {
-        if (current != null) {
-            printBSTInOrder(current.left);
-            System.out.print(current.value + " ");
-            printBSTInOrder(current.right);
-        }
-    }
+    // Traversal and printing methods
 
-    // ---------------- TRAVERSAL METHODS ----------------
-
-    // Prints the root first, then left subtree, then right subtree.
-    void printPreOrder(TreeNode current) {
-        if (current != null) {
-            System.out.print(current.value + " ");
-            printPreOrder(current.left);
-            printPreOrder(current.right);
-        }
-    }
-
-    // Prints values from smallest to largest.
     void printInOrder(TreeNode current) {
         if (current != null) {
             printInOrder(current.left);
@@ -185,7 +186,14 @@ public class AVLTree {
         }
     }
 
-    // Prints children before their parent.
+    void printPreOrder(TreeNode current) {
+        if (current != null) {
+            System.out.print(current.value + " ");
+            printPreOrder(current.left);
+            printPreOrder(current.right);
+        }
+    }
+
     void printPostOrder(TreeNode current) {
         if (current != null) {
             printPostOrder(current.left);
@@ -194,7 +202,50 @@ public class AVLTree {
         }
     }
 
-    // ---------------- RED-BLACK TREE DEMONSTRATION ----------------
+    void printInOrderWithColors(TreeNode current) {
+        if (current != null) {
+            printInOrderWithColors(current.left);
+            System.out.println("Node " + current.value + " is " + current.color);
+            printInOrderWithColors(current.right);
+        }
+    }
+
+    void printTreeShape(TreeNode current, int spaces) {
+        if (current == null) {
+            return;
+        }
+
+        spaces += 5;
+
+        printTreeShape(current.right, spaces);
+
+        System.out.println();
+        for (int i = 5; i < spaces; i++) {
+            System.out.print(" ");
+        }
+        System.out.println(current.value + "(" + current.color.charAt(0) + ")");
+
+        printTreeShape(current.left, spaces);
+    }
+
+    // Part 1: Coloring an AVL tree as a red-black tree
+
+    /*
+     * Red-black tree properties:
+     *
+     * 1. Every node is either red or black.
+     * 2. The root is black.
+     * 3. All null leaves are considered black.
+     * 4. A red node cannot have a red child.
+     * 5. Every path from a node to a null leaf must contain the same
+     * number of black nodes.
+     *
+     * Since an AVL tree is already height-balanced, it can be colored
+     * so that it satisfies the red-black tree rules.
+     *
+     * The code below demonstrates this by trying valid color choices
+     * for each subtree.
+     */
 
     class ColorChoice {
         String color;
@@ -210,34 +261,44 @@ public class AVLTree {
         }
     }
 
-    // Find possible valid red-black colorings for a subtree
-    java.util.ArrayList<ColorChoice> findColorChoices(TreeNode current) {
-        java.util.ArrayList<ColorChoice> choices = new java.util.ArrayList<>();
+    ArrayList<ColorChoice> findColorChoices(TreeNode current) {
+        ArrayList<ColorChoice> choices = new ArrayList<>();
 
-        // Null children are counted as black leaves
+        /*
+         * A null child is treated as a black leaf.
+         * In this program, its black height starts at 0.
+         */
         if (current == null) {
             choices.add(new ColorChoice("BLACK", 0, null, null));
             return choices;
         }
 
-        java.util.ArrayList<ColorChoice> leftChoices = findColorChoices(current.left);
-        java.util.ArrayList<ColorChoice> rightChoices = findColorChoices(current.right);
+        ArrayList<ColorChoice> leftChoices = findColorChoices(current.left);
+        ArrayList<ColorChoice> rightChoices = findColorChoices(current.right);
 
         for (ColorChoice left : leftChoices) {
             for (ColorChoice right : rightChoices) {
 
-                // Both sides must have the same black height
+                /*
+                 * Both subtrees need to have the same black height.
+                 */
                 if (left.blackHeight == right.blackHeight) {
 
-                    // Option 1: make current node black
+                    /*
+                     * Choice 1:
+                     * Make this node black.
+                     */
                     choices.add(new ColorChoice(
                             "BLACK",
                             left.blackHeight + 1,
                             left,
                             right));
 
-                    // Option 2: make current node red
-                    // Red nodes are only allowed to have black children
+                    /*
+                     * Choice 2:
+                     * Make this node red.
+                     * This is only allowed when both children are black.
+                     */
                     if (left.color.equals("BLACK") && right.color.equals("BLACK")) {
                         choices.add(new ColorChoice(
                                 "RED",
@@ -252,32 +313,20 @@ public class AVLTree {
         return choices;
     }
 
-    // Apply one selected coloring to the actual AVL tree nodes
     void applyColors(TreeNode current, ColorChoice choice) {
         if (current == null || choice == null) {
             return;
         }
 
         current.color = choice.color;
-
         applyColors(current.left, choice.leftChoice);
         applyColors(current.right, choice.rightChoice);
     }
 
-    /**
-     * Color the AVL tree using red-black rules.
-     *
-     * This method demonstrates that an AVL tree can be colored
-     * as a red-black tree by choosing colors that satisfy:
-     * 1. The root is black.
-     * 2. No red node has a red child.
-     * 3. Every path from a node to a null child has the same black height.
-     */
-    void colorAsRedBlackTree() {
-        java.util.ArrayList<ColorChoice> choices = findColorChoices(root);
+    void colorAVLAsRedBlackTree() {
+        ArrayList<ColorChoice> choices = findColorChoices(root);
 
         for (ColorChoice choice : choices) {
-            // The root of a red-black tree must be black
             if (choice.color.equals("BLACK")) {
                 applyColors(root, choice);
                 return;
@@ -287,113 +336,108 @@ public class AVLTree {
         System.out.println("No valid red-black coloring was found.");
     }
 
-    // Print values with their assigned colors
-    void printInOrderWithColors(TreeNode current) {
-        if (current != null) {
-            printInOrderWithColors(current.left);
-            System.out.println("Node " + current.value + " is " + current.color);
-            printInOrderWithColors(current.right);
-        }
-    }
-
-    // Prints the tree sideways so we can see the tree shape
-    void printTreeShape(TreeNode current, int spaces) {
-        if (current == null) {
-            return;
-        }
-
-        spaces += 5;
-
-        // Print right side first
-        printTreeShape(current.right, spaces);
+    void demonstrateAVLCanBeColoredAsRedBlackTree() {
+        System.out.println();
+        System.out.println("Part 1: Coloring an AVL tree as a red-black tree");
 
         System.out.println();
-        for (int i = 5; i < spaces; i++) {
-            System.out.print(" ");
-        }
-        System.out.println(current.value);
+        System.out.println("Red-black tree properties:");
+        System.out.println("1. Every node is red or black.");
+        System.out.println("2. The root is black.");
+        System.out.println("3. Null leaves are black.");
+        System.out.println("4. A red node cannot have a red child.");
+        System.out.println("5. Every path from a node to a null leaf has the same black height.");
 
-        // Print left side second
-        printTreeShape(current.left, spaces);
+        System.out.println();
+        System.out.println("Since an AVL tree is already height-balanced, it can be colored");
+        System.out.println("so that it satisfies the red-black tree rules.");
+        System.out.println("The program below demonstrates this by assigning colors recursively.");
+
+        System.out.println();
+        System.out.println("AVL tree before coloring:");
+        printTreeShape(root, 0);
+
+        colorAVLAsRedBlackTree();
+
+        System.out.println();
+        System.out.println("AVL tree after red-black coloring:");
+        printTreeShape(root, 0);
+
+        System.out.println();
+        System.out.println("Inorder traversal with colors:");
+        printInOrderWithColors(root);
+
+        System.out.println();
     }
 
-    void demonstrateBSTTransformationUsingSingleRotation() {
+    // Part 2: Showing that a single rotation keeps the BST property
+
+    void demonstrateSingleRotationTransformsBST() {
         System.out.println();
-        System.out.println("BST T1 to BST T2 using one AVL single rotation");
-        System.out.println("We start with a BST called T1.");
-        System.out.println("Then we apply one AVL single right rotation.");
-        System.out.println("After the rotation, the result is another BST called T2.");
-        System.out.println("T1 and T2 contain the exact same items.");
+        System.out.println("Part 2: Single AVL rotation transforms BST T1 into BST T2");
 
         /*
-         * BST T1 before rotation:
-         * 
+         * T1:
+         *
          * 30
          * /
          * 20
          * /
          * 10
-         * 
-         * T1 is a valid BST because:
-         * 10 < 20 < 30
+         *
+         * This is a valid BST because 10 < 20 < 30.
          */
 
         TreeNode t1 = new TreeNode(30);
         t1.left = new TreeNode(20);
         t1.left.left = new TreeNode(10);
 
-        // Set heights so the AVL rotation method can update them correctly.
         t1.left.left.height = 1;
         t1.left.height = 2;
         t1.height = 3;
 
         System.out.println();
-        System.out.println("BST T1 before the single rotation:");
+        System.out.println("BST T1 before rotation:");
         printTreeShape(t1, 0);
 
-        System.out.print("Items in T1 using inorder traversal: ");
+        System.out.print("Inorder traversal of T1: ");
         printInOrder(t1);
         System.out.println();
 
         /*
-         * Apply one AVL single right rotation.
-         * 
-         * BST T2 after rotation:
-         * 
+         * Apply a single right rotation at 30.
+         *
+         * T2:
+         *
          * 20
          * / \
          * 10 30
-         * 
-         * T2 is also a valid BST because:
-         * left child < root < right child
-         * 10 < 20 < 30
+         *
+         * T2 is also a valid BST.
          */
 
         TreeNode t2 = rotateRight(t1);
 
         System.out.println();
-        System.out.println("After applying one AVL single right rotation:");
-        System.out.println("BST T1 has been transformed into BST T2.");
-
-        System.out.println();
-        System.out.println("BST T2 after the single rotation:");
+        System.out.println("BST T2 after one right rotation:");
         printTreeShape(t2, 0);
 
-        System.out.print("Items in T2 using inorder traversal: ");
+        System.out.print("Inorder traversal of T2: ");
         printInOrder(t2);
         System.out.println();
 
         System.out.println();
-        System.out.println("Conclusion:");
-        System.out.println("T1 and T2 are both BSTs.");
-        System.out.println("T1 and T2 contain the same items: 10, 20, 30.");
-        System.out.println("The single rotation only changes the shape of the tree.");
-        System.out.println("It does not change the BST ordering or the stored items.");
+        System.out.println("Explanation:");
+        System.out.println("The inorder traversal before and after the rotation is the same.");
+        System.out.println("This shows that the rotation keeps the BST ordering.");
+        System.out.println("The rotation changes the shape of the tree, but not the stored values.");
+
+        System.out.println();
     }
 
-    // Store all values from T1 using inorder traversal.
-    // This gives the values in sorted order because T1 is a BST.
-    void storeInOrder(TreeNode current, java.util.ArrayList<Integer> values) {
+    // Part 3: Building T2 from T1 using AVL insertions
+
+    void storeInOrder(TreeNode current, ArrayList<Integer> values) {
         if (current != null) {
             storeInOrder(current.left, values);
             values.add(current.value);
@@ -401,49 +445,48 @@ public class AVLTree {
         }
     }
 
-    // Transform BST T1 into another BST T2 with the same items.
-    // T2 is created using AVL insertion, which uses rotations.
-    TreeNode transformT1ToT2UsingAVLRotations(TreeNode t1) {
-        java.util.ArrayList<Integer> values = new java.util.ArrayList<>();
+    /*
+     * This algorithm builds another BST, called T2, using the same values as T1.
+     *
+     * First, it does an inorder traversal of T1.
+     * Since T1 is a BST, this gives the values in sorted order.
+     *
+     * Then, each value is inserted into a new AVL tree.
+     * AVL insertion uses rotations when the tree becomes unbalanced.
+     *
+     * Note:
+     * This version creates a new tree T2.
+     * It does not rotate the original T1 directly.
+     *
+     * Time complexity:
+     * - The inorder traversal takes O(N).
+     * - Each AVL insertion takes O(log N).
+     * - N insertions take O(N log N).
+     * - So the total time is O(N log N).
+     */
+    TreeNode transformT1ToT2UsingAVLInsertions(TreeNode t1) {
+        ArrayList<Integer> values = new ArrayList<>();
 
-        // Step 1: Get all items from T1
         storeInOrder(t1, values);
 
-        // Step 2: Build T2 using AVL insertions
         TreeNode t2 = null;
 
         for (int value : values) {
-            t2 = add(t2, value);
+            t2 = addAVL(t2, value);
         }
 
         return t2;
     }
 
-    // Demonstrates the algorithm
     void demonstrateT1ToT2Algorithm() {
         System.out.println();
-        System.out.println("Transforming BST T1 into BST T2 using AVL rotations");
-
-        /*
-         * BST T1:
-         * 
-         * 15
-         * \
-         * 35
-         * \
-         * 45
-         * \
-         * 60
-         * \
-         * 75
-         * /
-         * 40
-         * 
-         * T1 is a BST, but it is not balanced.
-         */
+        System.out.println("Part 3: Algorithm to transform BST T1 into BST T2");
 
         TreeNode t1 = null;
 
+        /*
+         * Build an unbalanced BST T1.
+         */
         t1 = addBST(t1, 15);
         t1 = addBST(t1, 35);
         t1 = addBST(t1, 45);
@@ -455,83 +498,57 @@ public class AVLTree {
         System.out.println("BST T1 before transformation:");
         printTreeShape(t1, 0);
 
-        System.out.print("Items in T1: ");
+        System.out.print("Items in T1 using inorder traversal: ");
         printInOrder(t1);
         System.out.println();
 
-        TreeNode t2 = transformT1ToT2UsingAVLRotations(t1);
+        TreeNode t2 = transformT1ToT2UsingAVLInsertions(t1);
 
         System.out.println();
-        System.out.println("BST T2 after transformation using AVL rotations:");
+        System.out.println("BST T2 after using AVL insertions:");
         printTreeShape(t2, 0);
 
-        System.out.print("Items in T2: ");
+        System.out.print("Items in T2 using inorder traversal: ");
         printInOrder(t2);
         System.out.println();
 
         System.out.println();
-        System.out.println("Summary:");
-        System.out.println("T1 and T2 are both BSTs.");
-        System.out.println("T1 and T2 contain the same items.");
-        System.out.println("T2 was built using AVL insertion, which performs rotations when needed.");
+        System.out.println("Algorithm:");
+        System.out.println("1. Do an inorder traversal of T1.");
+        System.out.println("2. Store the values from T1 in an ArrayList.");
+        System.out.println("3. Create an empty tree T2.");
+        System.out.println("4. Insert each value into T2 using AVL insertion.");
+        System.out.println("5. When T2 becomes unbalanced, AVL rotations are used.");
+
+        System.out.println();
+        System.out.println("Time complexity:");
+        System.out.println("The inorder traversal takes O(N) time.");
+        System.out.println("Each AVL insertion takes O(log N) time.");
+        System.out.println("Since there are N insertions, this gives O(N log N) time overall.");
+
+        System.out.println();
+        System.out.println("Note:");
+        System.out.println("This version creates a new tree T2 using the same values from T1.");
+        System.out.println("It does not rotate the original T1 directly.");
+        System.out.println("AVL rotations still happen while T2 is being built.");
+
+        System.out.println();
     }
 
-    void printT1ToT2AlgorithmExplanation() {
-        System.out.println();
-        System.out.println("-------T1 to T2 Algorithm Explanation:-------");
-        System.out.println("We start with a regular Binary Search Tree called T1.");
-        System.out.println("The goal is to transform T1 into another Binary Search Tree called T2.");
-        System.out.println("T2 must contain the exact same items as T1.");
-        System.out.println();
-
-        System.out.println("Step 1:");
-        System.out.println("Perform an inorder traversal of T1.");
-        System.out.println("Because T1 is a BST, inorder traversal visits the values in sorted order.");
-        System.out.println();
-
-        System.out.println("Step 2:");
-        System.out.println("Store all values from T1 in an ArrayList.");
-        System.out.println("This takes O(N) time because every node is visited once.");
-        System.out.println();
-
-        System.out.println("Step 3:");
-        System.out.println("Create a new empty tree called T2.");
-        System.out.println("Insert every value from the ArrayList into T2 using the AVL add() method.");
-        System.out.println();
-
-        System.out.println("Step 4:");
-        System.out.println("The AVL add() method keeps T2 balanced.");
-        System.out.println("If T2 becomes unbalanced, the code uses AVL rotations.");
-        System.out.println("These rotations include single rotations such as rotateLeft() and rotateRight().");
-        System.out.println();
-
-        System.out.println("Why this is O(N log N) average time:");
-        System.out.println("The inorder traversal of T1 takes O(N) time.");
-        System.out.println("Then we insert N items into T2.");
-        System.out.println("Each AVL insertion takes O(log N) average time because the AVL tree height is O(log N).");
-        System.out.println("So N insertions take O(N log N) time.");
-        System.out.println();
-
-        System.out.println("Total time:");
-        System.out.println("O(N) + O(N log N) = O(N log N).");
-        System.out.println();
-
-        System.out.println("Summary:");
-        System.out.println("T1 and T2 are both BSTs.");
-        System.out.println("T1 and T2 contain the same items.");
-        System.out.println("The AVL rotations change the shape of the tree, but not the stored values.");
-    }
+    // Main method
 
     public static void main(String[] args) {
         AVLTree tree = new AVLTree();
 
-        // Build the AVL tree
-        tree.root = tree.add(tree.root, 15);
-        tree.root = tree.add(tree.root, 35);
-        tree.root = tree.add(tree.root, 45);
-        tree.root = tree.add(tree.root, 60);
-        tree.root = tree.add(tree.root, 75);
-        tree.root = tree.add(tree.root, 40);
+        /*
+         * Build an AVL tree for Part 1.
+         */
+        tree.root = tree.addAVL(tree.root, 15);
+        tree.root = tree.addAVL(tree.root, 35);
+        tree.root = tree.addAVL(tree.root, 45);
+        tree.root = tree.addAVL(tree.root, 60);
+        tree.root = tree.addAVL(tree.root, 75);
+        tree.root = tree.addAVL(tree.root, 40);
 
         System.out.println("AVL preorder traversal:");
         tree.printPreOrder(tree.root);
@@ -545,35 +562,10 @@ public class AVLTree {
         tree.printPostOrder(tree.root);
         System.out.println();
 
-        tree.colorAsRedBlackTree();
+        tree.demonstrateAVLCanBeColoredAsRedBlackTree();
 
-        System.out.println("AVL tree colored as a red-black tree:");
-        tree.printInOrderWithColors(tree.root);
-
-        // Build a normal BST using the same values
-        tree.bstRoot = tree.addBST(tree.bstRoot, 15);
-        tree.bstRoot = tree.addBST(tree.bstRoot, 35);
-        tree.bstRoot = tree.addBST(tree.bstRoot, 45);
-        tree.bstRoot = tree.addBST(tree.bstRoot, 60);
-        tree.bstRoot = tree.addBST(tree.bstRoot, 75);
-        tree.bstRoot = tree.addBST(tree.bstRoot, 40);
-
-        System.out.println();
-        System.out.println("Regular BST inorder traversal:");
-        tree.printBSTInOrder(tree.bstRoot);
-        System.out.println();
-
-        System.out.println("Searching for 40 in the BST:");
-        System.out.println(tree.searchBST(tree.bstRoot, 40));
-
-        System.out.println("Searching for 100 in the BST:");
-        System.out.println(tree.searchBST(tree.bstRoot, 100));
-
-        tree.demonstrateBSTTransformationUsingSingleRotation();
+        tree.demonstrateSingleRotationTransformsBST();
 
         tree.demonstrateT1ToT2Algorithm();
-
-        tree.printT1ToT2AlgorithmExplanation();
-
     }
 }
