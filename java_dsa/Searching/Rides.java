@@ -1,9 +1,6 @@
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Arrays;
 
 public class Rides {
-
-
 
     static String[] S1 = {
             "Space Mountain",
@@ -33,21 +30,23 @@ public class Rides {
 
     public static void main(String[] args) {
 
-        // Print all elements of S1
         System.out.println(
-                "Given some favourite rides at Disneyland and Disney World,\nI created two sets with rides from each park.\nHere we will look at the elements of each set and \nuse an algorithm to determine if both sets contain the same elements.");
+                "Given two sequences S1 and S2, possibly containing duplicates,\n"
+                        + "this program uses sorting to determine whether both sequences\n"
+                        + "contain the same set of elements.");
+
         System.out.println("---------------------------------------------");
-        System.out.println("Elements of S1 - Disneyland Rides:");
-        for (String ride : S1) {
-            System.out.println(ride);
+
+        System.out.println("Elements of S1:");
+        for (String element : S1) {
+            System.out.println(element);
         }
 
         System.out.println();
 
-        // Print all elements of S2
-        System.out.println("Elements of S2 - Disney World Rides: ");
-        for (String ride : S2) {
-            System.out.println(ride);
+        System.out.println("Elements of S2:");
+        for (String element : S2) {
+            System.out.println(element);
         }
 
         System.out.println();
@@ -56,120 +55,93 @@ public class Rides {
          * Algorithm:
          *
          * We want to determine whether S1 and S2 contain the same set of elements.
+         * Since the sequences may contain duplicates, duplicate copies of an element
+         * should not affect the answer.
          *
-         * A set does not store duplicates.
-         * For example, even though "Space Mountain" appears twice in S1,
-         * it will only appear once in the set.
+         * Because a total order relation is defined on the elements, we can sort
+         * both sequences.
          *
          * Step 1:
-         * Create an empty HashSet called set1.
+         * Make copies of S1 and S2 so the original sequences are not changed.
          *
          * Step 2:
-         * Add every element from S1 into set1.
+         * Sort both copied sequences.
          *
          * Step 3:
-         * Create another empty HashSet called set2.
+         * Scan through each sorted sequence and skip over duplicate elements.
          *
          * Step 4:
-         * Add every element from S2 into set2.
+         * Compare the unique elements from both sorted sequences.
          *
-         * Step 5:
-         * Compare set1 and set2 using .equals().
+         * If every unique element in S1 matches every unique element in S2,
+         * then S1 and S2 contain the same set of elements.
          *
-         * If set1.equals(set2) is true, then S1 and S2 contain the same set
-         * of elements.
-         *
-         * If set1.equals(set2) is false, then they do not contain the same set
-         * of elements.
-         *
-         * 
+         * If one sequence has a unique element that the other does not have,
+         * then they do not contain the same set of elements.
          */
+
+        boolean sameSet = containSameSet(S1, S2);
+
+        if (sameSet) {
+            System.out.println("S1 and S2 contain the same set of elements.");
+        } else {
+            System.out.println("S1 and S2 do not contain the same set of elements.");
+        }
 
         /*
          * Running Time Analysis:
          *
          * Let n be the number of elements in S1 and S2.
          *
-         * Adding all elements from S1 into set1 takes O(n) time.
-         * Adding all elements from S2 into set2 takes O(n) time.
-         * Comparing set1 and set2 using equals() takes O(n) time.
+         * Copying the sequences takes O(n) time.
+         * Sorting S1 takes O(n log n) time.
+         * Sorting S2 takes O(n log n) time.
+         * Scanning through both sorted sequences takes O(n) time.
          *
          * Total time:
-         * O(n) + O(n) + O(n) = O(n)
+         * O(n) + O(n log n) + O(n log n) + O(n)
+         * = O(n log n)
          *
-         * Therefore, this algorithm runs in O(n) time.
-         *
-         * It is efficient because HashSet operations such as add()
-         * and contains() usually take O(1) time.
+         * Therefore, this algorithm runs in O(n log n) time.
          *
          * Space Analysis:
          *
-         * We create two HashSets, set1 and set2.
-         * In the worst case, each set stores up to n elements.
-         *
+         * We create two copied arrays, each storing up to n elements.
          * Therefore, the space complexity is O(n).
          */
+    }
 
-        Set<String> set1 = new HashSet<>();
+    public static boolean containSameSet(String[] S1, String[] S2) {
 
-        for (String ride : S1) {
-            set1.add(ride);
+        String[] sortedS1 = Arrays.copyOf(S1, S1.length);
+        String[] sortedS2 = Arrays.copyOf(S2, S2.length);
+
+        Arrays.sort(sortedS1);
+        Arrays.sort(sortedS2);
+
+        int i = 0;
+        int j = 0;
+
+        while (i < sortedS1.length && j < sortedS2.length) {
+
+            String currentS1 = sortedS1[i];
+            String currentS2 = sortedS2[j];
+
+            int comparison = currentS1.compareTo(currentS2);
+
+            if (comparison != 0) {
+                return false;
+            }
+
+            while (i < sortedS1.length && sortedS1[i].equals(currentS1)) {
+                i++;
+            }
+
+            while (j < sortedS2.length && sortedS2[j].equals(currentS2)) {
+                j++;
+            }
         }
 
-        Set<String> set2 = new HashSet<>();
-
-        for (String ride : S2) {
-            set2.add(ride);
-        }
-
-        if (set1.equals(set2)) {
-            System.out.println("S1 and S2 contain the same set of elements.");
-        } else {
-            System.out.println("S1 and S2 do not contain the same set of elements.");
-        }
-
-        System.out.println();
-
-        // Rides only in S1:
-        // Make a copy of set1 so the original set1 is not changed.
-        Set<String> onlyInS1 = new HashSet<>(set1);
-
-        // Remove every ride that also appears in set2.
-        // What remains is only the rides that appear in S1.
-        onlyInS1.removeAll(set2);
-
-        System.out.println("Rides that appear only in S1:");
-        for (String ride : onlyInS1) {
-            System.out.println(ride);
-        }
-
-        System.out.println();
-
-        // Rides only in S2:
-        // Make a copy of set2 so the original set2 is not changed.
-        Set<String> onlyInS2 = new HashSet<>(set2);
-
-        // Remove every ride that also appears in set1.
-        // What remains is only the rides that appear in S2.
-        onlyInS2.removeAll(set1);
-
-        System.out.println("Rides that appear only in S2:");
-        for (String ride : onlyInS2) {
-            System.out.println(ride);
-        }
-
-        System.out.println();
-
-        // Rides in both S1 and S2:
-        // Make a copy of set1 so the original set1 is not changed.
-        Set<String> inBoth = new HashSet<>(set1);
-
-        // Keep only the rides that also appear in set2.
-        inBoth.retainAll(set2);
-
-        System.out.println("Rides that appear in both S1 and S2:");
-        for (String ride : inBoth) {
-            System.out.println(ride);
-        }
+        return i == sortedS1.length && j == sortedS2.length;
     }
 }
