@@ -1,3 +1,4 @@
+
 public class Searching {
     
     public static int linearSearch(int[] array, int target) {
