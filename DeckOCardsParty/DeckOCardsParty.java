@@ -2,7 +2,7 @@ public class DeckOCardsParty {
 
     Node head; // The starting point of the deck (the top card)
 
-    class Node {
+    public static class Node {
 
         String suit;
 
@@ -75,6 +75,36 @@ public class DeckOCardsParty {
             count++;
         }
 
+    }
+
+    /**
+     * This method removes and returns the top card of the deck
+     * 
+     * @return
+     */
+
+    public Node dealCard() {
+        // Check if there are any cards left to deal
+        if (head == null) {
+            System.out.println("The deck is empty. No cards to deal.");
+            return null; // Deck is empty
+        }
+
+        // Remembers the card that has been dealt
+        Node dealtCard = head;
+
+        // Shifts the pointer so the next card becomes the new top of the deck
+        head = head.next;
+        // if there is still a card at the top, its link to the old head needs to be cut
+        if (head != null) {
+            // set the new head previous pointer to null
+            head.previous = null;
+        }
+        // Cleaning the dealt card's pointer so it isn't still tethered to the deck
+        dealtCard.next = null;
+
+        // Return the dealt card
+        return dealtCard;
     }
 
 }
