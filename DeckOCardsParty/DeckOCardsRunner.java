@@ -22,6 +22,14 @@ public class DeckOCardsRunner {
         System.out.println("\nRemaining deck:");
         deck.printDeck(); // Ace and 2 should be gone, list should start at 3 of Hearts
 
+        System.out.println("--- Deck Before Shuffle ---");
+        deck.printDeck();
+
+        deck.shuffleDeck();
+
+        System.out.println("\n--- Deck After Shuffle ---");
+        deck.printDeck(); // Deck is now Randomized
+
     }
 
 }

@@ -107,4 +107,58 @@ public class DeckOCardsParty {
         return dealtCard;
     }
 
+    // "Shuffles the deck" by swapping the data (suit and rank) of random cards.
+    // This is a solution to using a doubly linked list since
+    // we can't just access a random index like an array
+
+    public void shuffleDeck() {
+        if (head == null || head.next == null) {
+            return; // Can't shuffle an empty deck or a deck with 1 card
+        }
+        // Count how many cards are left in the deck
+        int totalCards = 0;
+        Node temp = head;
+        while (temp != null) {
+            totalCards++;
+            temp = temp.next;
+        }
+
+        // Loop through every card and swap it with a random card
+
+        java.util.Random random = new java.util.Random();
+        Node current = head;
+
+        while (current != null) {
+            // Pick a random position in the deck
+            int randomIndex = random.nextInt(totalCards);
+
+            // Travel to that random card Node
+
+            Node randomCard = head;
+
+            for (int i = 0; i < randomIndex; i++) {
+                randomCard = randomCard.next;
+            }
+
+            // ----- Swapping the cards -----
+
+            // Saving the current data
+            String tempSuit = current.suit;
+            String tempRank = current.rank;
+
+            // Copying random card data to current data
+            current.suit = randomCard.suit;
+            current.rank = randomCard.rank;
+
+            // Copy saved current data to random card
+            randomCard.suit = tempSuit;
+            randomCard.rank = tempRank;
+
+            // Move to the next card in the deck to repeat the process
+            current = current.next;
+
+        }
+
+    }
+
 }
