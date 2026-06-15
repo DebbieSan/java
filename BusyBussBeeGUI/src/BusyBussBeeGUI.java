@@ -42,7 +42,7 @@ public class BusyBussBeeGUI {
     // Fields — accessible throughout the entire class
     // -------------------------------------------------------------------------
 
-    private LinkedList<String> tasks = new LinkedList<>(); // our data structure
+    private LinkedList<String> tasks = new LinkedList<>(); // the main data structure
 
     private JFrame frame; // the main application window
     private JTextArea taskDisplay; // multi-line area that shows the task list
@@ -65,7 +65,7 @@ public class BusyBussBeeGUI {
 
         // --- Main window (JFrame) ---
         frame = new JFrame("BusyBussBee Task Manager");
-        ImageIcon appIcon = new ImageIcon("BusyBussBeeGUIIcon.png"); // your image filename here
+        ImageIcon appIcon = new ImageIcon("BusyBussBeeGUIIcon.png"); // the image filename here
         frame.setIconImage(appIcon.getImage());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // close app on X
         frame.setSize(500, 450);
@@ -117,7 +117,7 @@ public class BusyBussBeeGUI {
 
         // --- ActionListeners — what happens when each button is clicked ---
 
-        // "Add Task" → appends to the end of the LinkedList (lowest priority)
+        // "Add Task" -> appends to the end of the LinkedList (lowest priority)
         addLastBtn.addActionListener(e -> {
             String task = taskInput.getText().trim();
             if (!task.isEmpty()) {
@@ -141,10 +141,10 @@ public class BusyBussBeeGUI {
             }
         });
 
-        // "Refresh List" → re-renders the current task list in the display area
+        // "Refresh List" -> re-renders the current task list in the display area
         viewBtn.addActionListener(e -> refreshDisplay());
 
-        // "Clear Input" → empties the text field without adding anything
+        // "Clear Input" -> empties the text field without adding anything
         clearInputBtn.addActionListener(e -> taskInput.setText(""));
 
         // Fun touch - pressing Enter in the text field triggers "Add Task"
