@@ -65,7 +65,7 @@ public class BusyBussBeeGUI {
 
         // --- Main window (JFrame) ---
         frame = new JFrame("BusyBussBee Task Manager");
-        ImageIcon appIcon = new ImageIcon("BusyBussBeeGUIIcon.png"); // the image filename here
+        ImageIcon appIcon = new ImageIcon(BusyBussBeeGUI.class.getResource("BusyBussBeeGUIIcon.png")); // the image filename here
         frame.setIconImage(appIcon.getImage());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // close app on X
         frame.setSize(500, 450);
