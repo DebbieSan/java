@@ -1,24 +1,27 @@
 
 /**
  * Browser History Stack is a Java program that simulates how a web browser
- * tracks your visited pages using Java's built-in Stack collection.
- * It demonstrates core stack operations: push (visiting a new page),
- * pop (going back and forward), and peek (viewing the current page).
+ * tracks your visited pages using Java's built-in Deque / ArrayDeque collection.
+ * It demonstrates core stack operations: push (visiting a new page or going forward),
+ * pop (going back or forward), and peek (viewing the current page).
  * It mirrors how a real browser's back and forward buttons work.
  */
+    
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Scanner;
-import java.util.Stack;
+
 
 public class BrowserHistoryStack {
 
     public static void main(String[] args) {
 
         // backHistory holds pages you have visited, most recent on top
-        Stack<String> backHistory = new Stack<>();
+       Deque<String> backHistory = new ArrayDeque<>();
 
         // forwardHistory holds pages you have gone back from, so you can return to them
-        Stack<String> forwardHistory = new Stack<>();
+        Deque<String> forwardHistory = new ArrayDeque<>();
 
         // Scanner reads the user's input from the keyboard
         Scanner scanner = new Scanner(System.in);
