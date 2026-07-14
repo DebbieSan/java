@@ -28,6 +28,13 @@ public class GradeTracker {
     grades.remove("Carls");
 
     System.out.println(grades);
+
+
+    System.out.println("Number of students: " + grades.size());
+
+    grades.replace("Kristie", 73);
+
+    System.out.println("Kristie's updated grade: " + grades.get("Kristie"));
 }
     
 }
